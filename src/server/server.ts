@@ -93,7 +93,7 @@ serverSocketIo.on('connection', function(clientSocket){
     serverSocketIo.emit('left-room', {user:data.user, message:'left-room.'})
 
     // send message
-    clientSocket.on('message', function(data){
+    clientSocket.on(+'message', function(data){
       serverSocketIo.in(data.room).emit('new-message',{user:data.user, message:data.message})
     });
 

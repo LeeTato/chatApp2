@@ -45,33 +45,28 @@ import { ChatService } from './services/chat.service';
 
 export class AppComponent {
   title = 'Chat-App';
-  user: String | undefined;
-  room: String | undefined;
-  // tslint:disable-next-line:ban-types
-  messageText: String | undefined;
-  messageArray: Array<{user: String , message: String }> = [];
+  user=""
+  room=""
+  messageText="";
+
+  messageArray: Array<{user: String , chat: String }> = [];
   constructor(private chatService:ChatService){
-    this.chatService.newUserJoined()
-      .subscribe(data => this.messageArray.push(data));
+
+    this.chatService.newUserJoined().subscribe(data => this.messageArray.push(data));
 
 
-    this.chatService.userLeftRoom()
-      .subscribe(data => this.messageArray.push(data));
+    this.chatService.userLeftRoom().subscribe(data => this.messageArray.push(data));
 
-    this.chatService.newMessageReceived()
-      .subscribe(data => this.messageArray.push(data));
+    this.chatService.newMessageReceived().subscribe((data:{user:String;chat:String;}) => this.messageArray.push(data));
   }
 
-  join(){
-      this.chatService.joinRoom({user: this.user, room: this.room});
-  }
+  join(){this.chatService.joinRoom({user: this.user, room: this.room});}
 
-  leave(){
-    this.chatService.leaveRoom({user: this.user, room: this.room});
-  }
+  leave(){this.chatService.leaveRoom({user: this.user, room: this.room});}
 
   sendMessage()
   {
-    this.chatService.sendMessage({user: this.user, room: this.room, message: this.messageText});
+    this.chatService.sendMessage({user: this.user, room: this.room, chat: this.messageText});
+    this.chatService.createMessage({ sender:this.user, text:this.messageText}).subscribe();
   }
 }

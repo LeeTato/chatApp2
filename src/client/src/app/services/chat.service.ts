@@ -1,14 +1,15 @@
+import { Chat } from '../../../../shared/model/chat.model';
 import { Injectable } from '@angular/core';
 import {  Observable } from 'rxjs';
 import io from 'socket.io-client';
 import { ApiService } from './api.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  user: String
-  room: String 
+
 
   constructor(private api:ApiService) { }
 
@@ -20,7 +21,7 @@ export class ChatService {
   }
 
   newUserJoined(){
-    let observable = new Observable<{user:String, message:string}>((observer:any)=>{
+    let observable = new Observable<{user:String, chat:string}>((observer:any)=>{
       this.socket.on('userJoined', (data:any)=>{
         observer.next(data);
       });
@@ -33,8 +34,8 @@ this.socket.emit('leave', data);
   }
 
   userLeftRoom(){
-    let observable = new Observable<{user:String, message:String}>(observer=>{
-      this.socket.on('left room', (data)=>{
+    let observable = new Observable<{user:String, chat:String}>(observer=>{
+      this.socket.on('left-room', (data)=>{
         observer.next(data);
       });
       return () => {this.socket.disconnect();}
@@ -48,14 +49,18 @@ this.socket.emit('leave', data);
     this.socket.emit('message',data);
   }
   newMessageReceived(){
-    let observable = new Observable<{user:String, message:String}>(observer=>{
-      this.socket.on('new message', (data)=>{
+    let observable = new Observable<{user:String, chat:String}>(observer=>{
+      this.socket.on('new-message', (data)=>{
         observer.next(data);
       });
       return () => {this.socket.disconnect();}
     });
 
     return observable;
+  }
+  createMessage(chat:Chat){
+    return this.api.post<{data: Chat}>('create-message', chat).pipe(map(res => res.data))
+
   }
 }
 
